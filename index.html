@@ -19,16 +19,16 @@
             <div class="system-stats">
                 <div class="stat-row">
                     <span class="stat-label">CPU LOAD:</span>
-                    <span class="stat-value" id="cpu-load">78%</span>
+                    <span class="stat-value" id="cpu-load">--</span>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 78%"></div>
+                        <div class="progress" id="cpu-load-progress"></div>
                     </div>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">MEMORY:</span>
-                    <span class="stat-value" id="memory-usage">2048MB</span>
+                    <span class="stat-value" id="memory-usage">--</span>
                     <div class="progress-bar">
-                        <div class="progress" style="width: 65%"></div>
+                        <div class="progress" id="memory-usage-progress"></div>
                     </div>
                 </div>
             </div>
@@ -54,6 +54,29 @@
 ├── <a href="https://justinwilcott.com" class="directory-link">portfolio/</a>
 ├── <a href="funds/index.html" class="directory-link">funds/</a>
 └── <span class="directory-link disabled">data/</span></pre>
+        </div>
+        <div class="panel gobs-program-panel">
+            <h2>Gob's Program</h2>
+            <div class="terminal-screen" id="gobs-program">
+                <div class="terminal-line">
+                    <span>Gob's Program: Y/N?</span>
+                </div>
+                <div class="terminal-line" id="gobs-echo-line">
+                    <span>?</span>
+                    <span id="gobs-current-input" class="terminal-input"></span>
+                    <span class="terminal-cursor" aria-hidden="true"></span>
+                </div>
+                <pre class="terminal-output" id="gobs-output"></pre>
+                <input
+                    type="text"
+                    id="gobs-input"
+                    class="terminal-hidden-input"
+                    maxlength="1"
+                    autocomplete="off"
+                    spellcheck="false"
+                    aria-label="Gob's Program response"
+                >
+            </div>
         </div>
     </div>
     <script src="js/dashboard.js"></script>
