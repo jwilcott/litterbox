@@ -1,0 +1,257 @@
+:root {
+  --primary-color: #33ff33;
+  --background-color: #000000;
+  --font-family: 'Courier New', Courier, monospace;
+  --scanline-size: 2px;
+  --scanline-animation-speed: 8s;
+  --panel-border: 2px solid var(--primary-color);
+  --panel-padding: 15px;
+  --interference-color: rgba(51, 255, 51, 0.15);
+  --flicker-speed: 0.1s;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--primary-color);
+  font-family: var(--font-family);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  position: relative;
+  overflow: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;  /* Internet Explorer and Edge */
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(transparent 50%, rgba(0, 0, 0, 0.5) 50%),
+    linear-gradient(90deg, var(--interference-color), transparent 50%, var(--interference-color));
+  background-size: 100% var(--scanline-size), 100% 100%;
+  pointer-events: none;
+  animation: 
+    scanlines var(--scanline-animation-speed) linear infinite,
+    interference 2s linear infinite,
+    flicker var(--flicker-speed) infinite;
+  z-index: 999;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 100px rgba(51, 255, 51, 0.1);
+  pointer-events: none;
+}
+
+h1 {
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+@keyframes scanlines {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--scanline-size));
+  }
+}
+
+@keyframes interference {
+  0% { opacity: 1; }
+  50% { opacity: 1; }
+  52% { opacity: 0.8; }
+  54% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+@keyframes flicker {
+  0% { opacity: 0.9; }
+  50% { opacity: 1; }
+  100% { opacity: 0.9; }
+}
+
+.dashboard {
+  gap: 20px;
+  padding: 0 20px 20px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.panel {
+  border: var(--panel-border);
+  padding: 10px var(--panel-padding);
+  background: rgba(0, 0, 0, 0.5);
+  width: calc(100% - 40px); /* Match header width accounting for padding */
+  margin: 0 auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.panel h2 {
+  margin: 0 0 15px 0;
+  font-size: 1.2em;
+  border-bottom: 1px solid var(--primary-color);
+}
+
+pre {
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.weather-info div {
+  margin: 5px 0;
+}
+
+.directory-list {
+  margin: 0;
+}
+
+/* .ascii-map class is no longer needed */
+
+.map-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+#globeCanvas {
+    width: 100% !important;
+    height: calc(100% - 50px) !important;
+    background-color: transparent;
+}
+
+.main-header {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 1rem 1.2rem 1.2rem 1.2rem;
+    text-align: center;
+    border: var(--panel-border);
+    margin: 20px auto 0 auto;
+    position: relative;
+    max-width: 600px;
+    box-sizing: border-box;
+}
+
+/* Remove the custom ::before since we want to use the global CRT effect */
+.main-header::before {
+    display: none;
+}
+
+.main-header h1 {
+    color: var(--primary-color);
+    margin: 0;
+    font-family: var(--font-family);
+    font-size: 1.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: bold;
+    border-bottom: none;
+    padding: 0;
+}
+
+.directory-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.directory-link:hover {
+    text-decoration: underline;
+    animation: flicker 0.1s infinite;
+}
+
+.directory-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.directory-link.disabled:hover::after {
+    content: 'ACCESS DENIED';
+    position: absolute;
+    top: -20px;
+    left: 0;
+    background: var(--background-color);
+    border: 1px solid var(--primary-color);
+    padding: 2px 5px;
+    font-size: 0.8em;
+    white-space: nowrap;
+}
+
+.funds-display {
+    text-align: center;
+    padding: 20px;
+}
+
+.lcd-display {
+    font-family: "Digital-7", var(--font-family);
+    font-size: 3em;
+    padding: 20px;
+    margin: 20px 0;
+    background: rgba(51, 255, 51, 0.1);
+    border: 1px solid var(--primary-color);
+    text-shadow: 0 0 5px var(--primary-color);
+}
+
+.target-funds {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: rgba(51, 255, 51, 0.1);
+    border: 1px solid var(--primary-color);
+    margin: 20px 0;
+}
+
+.progress {
+    height: 100%;
+    background-color: var(--primary-color);
+    transition: width 0.5s ease-in-out;
+}
+
+.status {
+    font-size: 1.2em;
+    margin-top: 20px;
+}
+
+.status.active {
+    color: #33ff33;
+    animation: flicker 0.1s infinite;
+}
+
+.status.standby {
+    color: #ff3333;
+}
+
+.funds-panel {
+    grid-column: span 2;
+}
+
+.datetime-display {
+    font-family: var(--font-family);
+    text-align: center;
+    font-size: 1.2em;
+    padding: 10px;
+    background: rgba(51, 255, 51, 0.1);
+    border: 1px solid var(--primary-color);
+    margin-top: 10px;
+}

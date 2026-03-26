@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retro Computing Design System</title>
+    <link rel="stylesheet" href="css/design.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <header class="main-header">
+        <h1>Tactical Decisions & Mild Panic Center</h1>
+    </header>
+    <div class="dashboard">
+        <div class="panel datetime-panel">
+            <h2>System Time</h2>
+            <div id="date"></div>
+            <div id="time"></div>
+            <div class="system-stats">
+                <div class="stat-row">
+                    <span class="stat-label">CPU LOAD:</span>
+                    <span class="stat-value" id="cpu-load">78%</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 78%"></div>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">MEMORY:</span>
+                    <span class="stat-value" id="memory-usage">2048MB</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 65%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel map-panel">
+            <h2>World Map</h2>
+            <canvas id="globeCanvas"></canvas>
+        </div>
+        <div class="panel weather-panel">
+            <h2>Weather Status</h2>
+            <div class="weather-info">
+                <div>TEMP: 72°F</div>
+                <div>STATUS: CLEAR</div>
+                <div>HUMIDITY: 45%</div>
+            </div>
+        </div>
+        <div class="panel directory-panel">
+            <h2>Directory</h2>
+            <pre class="directory-list">
+/root
+├── <a href="https://blog.justinwilcott.com" class="directory-link">blog/</a>
+├── <a href="https://litterbox.justinwilcott.com" class="directory-link">litterbox/</a>
+├── <a href="https://justinwilcott.com" class="directory-link">portfolio/</a>
+├── <a href="funds/index.html" class="directory-link">funds/</a>
+└── <span class="directory-link disabled">data/</span></pre>
+        </div>
+    </div>
+    <script src="js/dashboard.js"></script>
+    <script src="js/globe.js"></script>
+</body>
+</html>
