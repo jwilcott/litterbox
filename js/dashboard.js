@@ -11,6 +11,8 @@ const metricElements = {
     gobsOutput: document.getElementById('gobs-output'),
 };
 
+let activeRevision = null;
+
 function updateDateTime() {
     const now = new Date();
 
@@ -169,10 +171,41 @@ function initializeGobsProgram() {
     }, { once: true });
 }
 
+async function checkForRemoteUpdates() {
+    try {
+        const response = await fetch(`version.json?ts=${Date.now()}`, {
+            cache: 'no-store',
+        });
+
+        if (!response.ok) {
+            return;
+        }
+
+        const payload = await response.json();
+
+        if (!payload.commit) {
+            return;
+        }
+
+        if (activeRevision === null) {
+            activeRevision = payload.commit;
+            return;
+        }
+
+        if (payload.commit !== activeRevision) {
+            window.location.reload();
+        }
+    } catch (error) {
+        // Ignore transient polling failures so the dashboard keeps running.
+    }
+}
+
 updateDateTime();
 updateMemoryUsage();
 updateCpuLoad();
 initializeGobsProgram();
+checkForRemoteUpdates();
 
 setInterval(updateDateTime, 1000);
 setInterval(updateMemoryUsage, 5000);
+setInterval(checkForRemoteUpdates, 30000);
