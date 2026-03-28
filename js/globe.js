@@ -1,9 +1,11 @@
 let scene, camera, renderer, globeModel;
 
+const GLOBE_COLOR = 0x33ff33;
+
 function createFallbackGlobe() {
     const geometry = new THREE.SphereGeometry(1, 32, 32);
     const material = new THREE.MeshBasicMaterial({
-        color: 0x33ff33,
+        color: GLOBE_COLOR,
         wireframe: true,
         transparent: true,
         opacity: 0.4
@@ -12,21 +14,89 @@ function createFallbackGlobe() {
     return new THREE.Mesh(geometry, material);
 }
 
+function createGlobeLineMaterial() {
+    return new THREE.LineBasicMaterial({
+        color: GLOBE_COLOR,
+        transparent: true,
+        opacity: 0.85
+    });
+}
+
+function parseObjLinePaths(objText) {
+    const vertices = [];
+    const paths = [];
+
+    objText.split(/\r?\n/).forEach((rawLine) => {
+        const line = rawLine.trim();
+
+        if (!line || line.startsWith('#')) {
+            return;
+        }
+
+        if (line.startsWith('v ')) {
+            const [, x, y, z] = line.split(/\s+/);
+            vertices.push(new THREE.Vector3(Number(x), Number(y), Number(z)));
+            return;
+        }
+
+        if (!line.startsWith('l ')) {
+            return;
+        }
+
+        const points = line
+            .split(/\s+/)
+            .slice(1)
+            .map((token) => {
+                const vertexToken = token.split('/')[0];
+                const vertexIndex = Number(vertexToken);
+
+                if (Number.isNaN(vertexIndex)) {
+                    return null;
+                }
+
+                const normalizedIndex = vertexIndex < 0
+                    ? vertices.length + vertexIndex
+                    : vertexIndex - 1;
+
+                return vertices[normalizedIndex] || null;
+            })
+            .filter(Boolean);
+
+        if (points.length >= 2) {
+            paths.push(points);
+        }
+    });
+
+    return paths;
+}
+
+function buildGlobeFromPaths(paths) {
+    const group = new THREE.Group();
+    const material = createGlobeLineMaterial();
+
+    paths.forEach((points) => {
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const coastline = new THREE.Line(geometry, material);
+        group.add(coastline);
+    });
+
+    return group;
+}
+
 function styleLoadedGlobe(object) {
+    const lineMaterial = createGlobeLineMaterial();
+    const meshMaterial = new THREE.MeshBasicMaterial({
+        color: GLOBE_COLOR,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5
+    });
+
     object.traverse((child) => {
         if (child.isLine || child.isLineSegments) {
-            child.material = new THREE.LineBasicMaterial({
-                color: 0x33ff33,
-                transparent: true,
-                opacity: 0.85
-            });
+            child.material = lineMaterial;
         } else if (child.isMesh) {
-            child.material = new THREE.MeshBasicMaterial({
-                color: 0x33ff33,
-                wireframe: true,
-                transparent: true,
-                opacity: 0.5
-            });
+            child.material = meshMaterial;
         }
     });
 
@@ -38,24 +108,32 @@ function styleLoadedGlobe(object) {
 }
 
 function loadGlobeModel() {
-    const loader = new THREE.OBJLoader();
+    fetch('assets/world-coastlines.obj')
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Failed to load globe model: ${response.status}`);
+            }
 
-    loader.load(
-        'assets/world-coastlines.obj',
-        (object) => {
+            return response.text();
+        })
+        .then((objText) => {
+            const coastlinePaths = parseObjLinePaths(objText);
+
+            if (coastlinePaths.length === 0) {
+                throw new Error('No coastline paths found in globe model');
+            }
+
             if (globeModel) {
                 scene.remove(globeModel);
             }
 
-            globeModel = styleLoadedGlobe(object);
+            globeModel = styleLoadedGlobe(buildGlobeFromPaths(coastlinePaths));
             scene.add(globeModel);
-        },
-        undefined,
-        () => {
+        })
+        .catch(() => {
             globeModel = createFallbackGlobe();
             scene.add(globeModel);
-        }
-    );
+        });
 }
 
 function initGlobe() {
